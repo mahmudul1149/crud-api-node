@@ -30,13 +30,11 @@ app.post("/todo", async (req, res) => {
   try {
     await client.connect();
 
-    const todoCount = await client
-      .db("todos-collection")
-      .collection("todos")
-      .countDocuments({});
-
     const todo = req.body;
-    todo.id = todoCount + 1;
+
+    const id = new ObjectId();
+
+    todo._id = id;
 
     await client.db("todos-collection").collection("todos").insertOne(todo);
 

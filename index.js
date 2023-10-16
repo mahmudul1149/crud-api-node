@@ -30,13 +30,18 @@ app.post("/todo", async (req, res) => {
   try {
     await client.connect();
 
-    const todoCount = await client
+    const maxIdTodo = await client
       .db("todos-collection")
       .collection("todos")
-      .countDocuments({});
+      .find()
+      .sort({ id: -1 })
+      .limit(1)
+      .toArray();
+
+    const maxId = maxIdTodo.length > 0 ? maxIdTodo[0].id : 0;
 
     const todo = req.body;
-    todo.id = todoCount + 1;
+    todo.id = maxId + 1;
 
     await client.db("todos-collection").collection("todos").insertOne(todo);
 
@@ -52,6 +57,7 @@ app.post("/todo", async (req, res) => {
     });
   }
 });
+
 app.put("/todo/:id", async (req, res) => {
   try {
     await client.connect();

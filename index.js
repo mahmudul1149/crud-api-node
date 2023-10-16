@@ -93,11 +93,13 @@ app.put("/todo/:id", async (req, res) => {
 app.delete("/todo/:id", async (req, res) => {
   try {
     await client.connect();
-    const id = parseInt(req.params.id);
+    const todoIdToDelete = req.params.id;
+
     const deleted = await client
       .db("todos-collection")
       .collection("todos")
-      .deleteOne({ id });
+      .deleteOne({ id: todoIdToDelete });
+
     if (deleted.deletedCount === 0) {
       res.send({
         success: false,

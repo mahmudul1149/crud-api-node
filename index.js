@@ -93,7 +93,7 @@ app.put("/todo/:id", async (req, res) => {
 app.delete("/todo/:id", async (req, res) => {
   try {
     await client.connect();
-    const todoIdToDelete = req.params.id;
+    const todoIdToDelete = parseInt(req.params.id);
 
     const deleted = await client
       .db("todos-collection")
@@ -101,13 +101,14 @@ app.delete("/todo/:id", async (req, res) => {
       .deleteOne({ id: todoIdToDelete });
 
     if (deleted.deletedCount === 0) {
-      res.send({
+      res.status(404).send({
         success: false,
-        message: "Could not delete todo",
+        message: "Todo not found",
       });
     } else {
       res.send({
         success: true,
+        message: "Todo deleted successfully",
       });
     }
   } catch (error) {
@@ -116,6 +117,9 @@ app.delete("/todo/:id", async (req, res) => {
       success: false,
       message: "Internal server error",
     });
+  } finally {
+    // Close the MongoDB connection to release resources
+    await client.close();
   }
 });
 
